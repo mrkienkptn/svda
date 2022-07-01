@@ -1,0 +1,27 @@
+const { Router } = require('express')
+
+const { learningPathController: controller } = require('../../controllers')
+const { lpValidation: validation } = require('../../validations')
+const { verifyToken } = require('../../middlewares')
+
+const router = Router()
+
+router.route('/')
+  .post(verifyToken, validation.createLPValidate, controller.createLearningPath)
+  .get(verifyToken, controller.getMyLPs)
+
+router.route('/results')
+  .get(validation.searchLPValidate, controller.searchLearningPath)
+
+router.route('/:learningPathId')
+  .get(verifyToken, validation.getLPDetailValidate, controller.getLPDetail)
+  .delete(verifyToken, validation.deleteLPValidate, controller.deleteLP)
+  .post(verifyToken, validation.cloneLPValidate, controller.forkLP)
+  .put(verifyToken, validation.updateLPValidate, controller.updateLP)
+
+router.route('/:learningPathId/editors')
+  .get(verifyToken, validation.getLPEditorsValidate, controller.getLPEditors)
+  .post(verifyToken, validation.editEditorValidate, controller.addEditor)
+  .delete(verifyToken, validation.editEditorValidate, controller.removeEditor)
+
+module.exports = router

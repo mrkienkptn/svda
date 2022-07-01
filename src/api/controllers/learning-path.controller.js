@@ -1,0 +1,129 @@
+const httpStatus = require('http-status')
+const getApiResponse = require('../utils/response')
+
+const { learningPathRepo, editPermissionRepo } = require('../repo')
+
+const searchLearningPath = async (req, res, next) => {
+  try {
+    const rs = await learningPathRepo.searchLP(req.query)
+    return res.status(httpStatus.OK).json(getApiResponse({ data: rs }))
+  } catch (error) {
+    next(error)
+  }
+}
+
+const createLearningPath = async (req, res, next) => {
+  const { id: ownerId } = req.payload
+  const data = req.body
+  try {
+    const createdLearningPath = await learningPathRepo.createLearningPath({ ownerId, ...data })
+    await editPermissionRepo.createEditPermission(createdLearningPath._id, ownerId)
+    return res.status(httpStatus.OK).json(getApiResponse({ data: createdLearningPath }))
+  } catch (error) {
+    next(error)
+  }
+}
+
+const getMyLPs = async (req, res, next) => {
+  const { id, userType } = req.payload
+  try {
+    const myLPs = await learningPathRepo.getMyLP(id, userType)
+    return res.status(httpStatus.OK).json(getApiResponse({ data: myLPs }))
+  } catch (error) {
+    next(error)
+  }
+}
+
+const getLPDetail = async (req, res, next) => {
+  const { learningPathId } = req.params
+  const { id } = req.payload
+  try {
+    const lp = await learningPathRepo.getLPDetail(learningPathId)
+    if (lp) {
+      if (lp.ownerId) {
+        lp.yours = lp.ownerId._id.toString() === id
+      } else {
+        lp.yours = false
+      }
+    }
+    return res.status(httpStatus.OK).json(getApiResponse({ data: lp }))
+  } catch (error) {
+    next(error)
+  }
+}
+
+const deleteLP = async (req, res, next) => {
+  const { learningPathId } = req.params
+  try {
+    await learningPathRepo.deleteLP(learningPathId)
+    return res.status(httpStatus.OK).json(getApiResponse({ msg: 'Deleted' }))
+  } catch (error) {
+    next(error)
+  }
+}
+
+const forkLP = async (req, res, next) => {
+  const { learningPathId } = req.params
+  const { id } = req.payload
+  try {
+    const rs = await learningPathRepo.forkLP(learningPathId, id)
+    return res.status(httpStatus.OK).json(getApiResponse({ data: rs }))
+  } catch (error) {
+    next(error)
+  }
+}
+
+const updateLP = async (req, res, next) => {
+  const { learningPathId } = req.params
+  try {
+    const rs = await learningPathRepo.updateLP(learningPathId, req.body)
+    return res.status(httpStatus.OK).json(getApiResponse({ data: rs }))
+  } catch (error) {
+    next(error)
+  }
+}
+
+const addEditor = async (req, res, next) => {
+  const { learningPathId } = req.params
+  const { userId } = req.body
+  try {
+    const rs = await learningPathRepo.addEditor(learningPathId, userId)
+    return res.status(httpStatus.OK).json(getApiResponse({ data: rs }))
+  } catch (error) {
+    next(error)
+  }
+}
+
+const removeEditor = async (req, res, next) => {
+  const { learningPathId } = req.params
+  const { userId } = req.body
+  try {
+    const rs = await learningPathRepo.removeEditor(learningPathId, userId)
+    return res.status(httpStatus.OK).json(getApiResponse({ data: rs }))
+  } catch (error) {
+    next(error)
+  }
+}
+
+const getLPEditors = async (req, res, next) => {
+  const { learningPathId } = req.params
+  try {
+    const rs = await learningPathRepo.getLPEditors(learningPathId)
+    return res.status(httpStatus.OK).json(getApiResponse({ data: rs }))
+  } catch (error) {
+    next(error)
+  }
+}
+
+module.exports = {
+  searchLearningPath,
+  createLearningPath,
+  forkLP,
+  getMyLPs,
+  getLPDetail,
+  deleteLP,
+  updateLP,
+  addEditor,
+  removeEditor,
+  getLPEditors
+}
