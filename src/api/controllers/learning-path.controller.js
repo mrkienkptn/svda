@@ -1,6 +1,9 @@
 const httpStatus = require('http-status')
-const getApiResponse = require('../utils/response')
+const fs = require('fs')
+const path = require('path')
+const archiver = require('archiver')
 
+const getApiResponse = require('../utils/response')
 const { learningPathRepo, editPermissionRepo } = require('../repo')
 
 const searchLearningPath = async (req, res, next) => {
@@ -38,7 +41,7 @@ const getLPDetail = async (req, res, next) => {
   const { learningPathId } = req.params
   const { id } = req.payload
   try {
-    const lp = await learningPathRepo.getLPDetail(learningPathId)
+    const lp = await learningPathRepo.getLPDetail(learningPathId, id)
     if (lp) {
       if (lp.ownerId) {
         lp.yours = lp.ownerId._id.toString() === id
@@ -115,6 +118,55 @@ const getLPEditors = async (req, res, next) => {
   }
 }
 
+const starLP = async (req, res, next) => {
+  const { learningPathId } = req.params
+  const { id } = req.payload
+  try {
+    const rs = await learningPathRepo.starLP(id, learningPathId)
+    return res.status(httpStatus.OK).json(getApiResponse({ data: rs }))
+  } catch (error) {
+    next(error)
+  }
+}
+
+const unStarLP = async (req, res, next) => {
+  const { learningPathId } = req.params
+  const { id } = req.payload
+  try {
+    const rs = await learningPathRepo.unStarLP(id, learningPathId)
+    return res.status(httpStatus.OK).json(getApiResponse({ data: rs }))
+  } catch (error) {
+    next(error)
+  }
+}
+
+const getCourseData = async (req, res, next) => {
+  const { learningPathId } = req.params
+  try {
+    const rs = await learningPathRepo.getCourseData(learningPathId)
+    return res.status(httpStatus.OK).json(getApiResponse({ data: rs }))
+  } catch (error) {
+    next(error)
+  }
+}
+
+const exportCourse = async (req, res, next) => {
+  const { learningPathId } = req.params
+  try {
+    const courseData = await learningPathRepo.getCourseData(learningPathId)
+    const jsonData = JSON.stringify(courseData)
+    const scormPath = path.join(__dirname, '..', '..', 'asset', 'scorm/')
+    const dataPath = path.join(__dirname, '..', '..', 'asset', 'scorm', 'data', 'data.json')
+    fs.writeFileSync(dataPath, jsonData)
+    const archive = archiver('zip')
+    archive.directory(scormPath, false)
+    archive.pipe(res)
+    archive.finalize()
+  } catch (error) {
+    next(error)
+  }
+}
+
 module.exports = {
   searchLearningPath,
   createLearningPath,
@@ -125,5 +177,9 @@ module.exports = {
   updateLP,
   addEditor,
   removeEditor,
-  getLPEditors
+  getLPEditors,
+  starLP,
+  unStarLP,
+  getCourseData,
+  exportCourse
 }

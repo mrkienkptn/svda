@@ -61,7 +61,12 @@ const updateStep = {
     startDate: Joi.date(),
     finishDate: Joi.date(),
     notify: Joi.boolean(),
-    resources: Joi.array().items(Joi.object())
+    resources: Joi.array().items(Joi.object()),
+    referenceLinks: Joi.array().items(Joi.object()),
+    reminderBefore: Joi.number().min(1),
+    updateChecklistType: Joi.string(),
+    content: Joi.object(),
+    ownerId: Joi.string()
   })
 }
 
@@ -75,6 +80,15 @@ const deleteStep = {
 const followRoadmap = {
   params: Joi.object({
     roadmapId: Joi.string().required()
+  }),
+  body: Joi.object({
+    ownerId: Joi.string()
+  })
+}
+
+const starRoadmap = {
+  params: Joi.object({
+    roadmapId: Joi.string().required()
   })
 }
 
@@ -85,5 +99,6 @@ module.exports = {
   createStepValidate: customValidate(createStep),
   updateStepValidate: customValidate(updateStep),
   deleteStepValidate: customValidate(deleteStep),
-  followRoadmapValidate: customValidate(followRoadmap)
+  followRoadmapValidate: customValidate(followRoadmap),
+  starRoadmapValidate: customValidate(starRoadmap)
 }

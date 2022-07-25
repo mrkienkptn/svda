@@ -3,10 +3,19 @@ const { ObjectId } = mongoose.Schema.Types
 
 const notificationSchema = new mongoose.Schema(
   {
+    notifType: {
+      type: String
+    },
+    learningPath: {
+      type: String
+    },
+    roadmap: {
+      type: String
+    },
     from: {
       type: ObjectId,
       ref: 'user',
-      required: true
+      index: true
     },
     to: {
       type: ObjectId,
@@ -15,14 +24,16 @@ const notificationSchema = new mongoose.Schema(
       index: true
     },
     content: {
-      type: String,
-      required: true
+      type: Object
     },
     seen: {
       type: Boolean,
       required: true,
       default: false
     }
+  },
+  {
+    timestamps: true
   }
 )
 notificationSchema.indexes()

@@ -24,4 +24,8 @@ router.route('/:roadmapId/steps/:stepId')
   .put(verifyToken, validation.updateStepValidate, controller.updateStep)
   .delete(verifyToken, validation.deleteStepValidate, controller.deleteStep)
 
+router.route('/:roadmapId/stars')
+  .post(verifyToken, validation.starRoadmapValidate, controller.starRoadmap)
+  .delete(verifyToken, validation.starRoadmapValidate, controller.unStarRoadmap)
+
 module.exports = router

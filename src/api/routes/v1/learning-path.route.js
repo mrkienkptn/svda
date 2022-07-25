@@ -24,4 +24,11 @@ router.route('/:learningPathId/editors')
   .post(verifyToken, validation.editEditorValidate, controller.addEditor)
   .delete(verifyToken, validation.editEditorValidate, controller.removeEditor)
 
+router.route('/:learningPathId/stars')
+  .post(verifyToken, validation.starLPValidation, controller.starLP)
+  .delete(verifyToken, validation.starLPValidation, controller.unStarLP)
+
+router.route('/:learningPathId/export')
+  .get(controller.exportCourse)
+
 module.exports = router

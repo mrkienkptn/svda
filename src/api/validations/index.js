@@ -9,6 +9,7 @@ const uploadValidation = require('./upload.validation')
 const rubricValidation = require('./rubric.validation')
 const organizationValidation = require('./organization.validation')
 const roadmapValidation = require('./roadmap.validation')
+const adminValidation = require('./admin.validation')
 
 module.exports = {
   userValidation,
@@ -21,5 +22,6 @@ module.exports = {
   uploadValidation,
   rubricValidation,
   organizationValidation,
-  roadmapValidation
+  roadmapValidation,
+  adminValidation
 }

@@ -12,6 +12,8 @@ const uploadRoutes = require('./upload.route')
 const rubricRoutes = require('./rubric.route')
 const organizationRoutes = require('./organization.route')
 const roadmapRoutes = require('./roadmap.route')
+const notifRoutes = require('./notif.route')
+const adminRoutes = require('./admin.route')
 
 const router = express.Router()
 
@@ -27,5 +29,7 @@ router.use('/uploads', uploadRoutes)
 router.use('/rubrics', rubricRoutes)
 router.use('/organizations', organizationRoutes)
 router.use('/roadmaps', roadmapRoutes)
+router.use('/notifs', notifRoutes)
+router.use('/admin', adminRoutes)
 
 module.exports = router

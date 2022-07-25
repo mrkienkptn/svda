@@ -6,7 +6,8 @@ const learningPathSchema = new mongoose.Schema(
   {
     id: {
       type: String,
-      default: () => nanoid(10)
+      default: () => nanoid(10),
+      index: true
     },
     stars: {
       type: Number,
@@ -65,6 +66,9 @@ const learningPathSchema = new mongoose.Schema(
       type: Number,
       default: 0
     }
+  },
+  {
+    timestamps: true
   }
 )
 learningPathSchema.indexes()

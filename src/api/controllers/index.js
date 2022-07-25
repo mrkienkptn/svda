@@ -9,6 +9,9 @@ const commentController = require('./comment.controller')
 const uploadController = require('./upload.controller')
 const rubricController = require('./rubric.controller')
 const roadmapController = require('./roadmap.controller')
+const notifController = require('./notif.controller')
+const analysisController = require('./analysis.controller')
+const adminController = require('./admin.controller')
 
 module.exports = {
   userController,
@@ -21,5 +24,8 @@ module.exports = {
   commentController,
   uploadController,
   rubricController,
-  roadmapController
+  roadmapController,
+  notifController,
+  analysisController,
+  adminController
 }

@@ -1,11 +1,14 @@
 const { ObjectId } = require('mongoose').Types
 
-const { Roadmap, RoadmapStep, UserFollowRoadmap } = require('../models')
+const { Roadmap, RoadmapStep, UserFollowRoadmap, UserStarRoadmap } = require('../models')
 
 const getRoadmapDetail = async (id) => {
-  return await Roadmap.findOne({ id })
-    .populate('steps')
-    .lean()
+  return await Roadmap.findOne({ id }).populate('steps').lean()
+}
+
+const isFollowing = async (roadmapId, userId) => {
+  const ufr = await UserFollowRoadmap.findOne({ roadmap: roadmapId, user: userId })
+  return ufr !== null
 }
 
 const getMyRoadmaps = async (ownerId) => {
@@ -37,7 +40,7 @@ const deleteStep = async (roadmapId, stepId) => {
 
 const createStep = async (roadmapId, stepData) => {
   const stepId = new ObjectId()
-  const createStep = (new RoadmapStep({ _id: stepId, ...stepData })).save()
+  const createStep = new RoadmapStep({ _id: stepId, ...stepData }).save()
   const addStepToRoadmap = Roadmap.findOneAndUpdate(
     { id: roadmapId },
     {
@@ -57,13 +60,23 @@ const updateStep = async (id, data) => {
 }
 
 const followRoadmap = async (roadmapId, userId) => {
-  await new UserFollowRoadmap({ roadmap: roadmapId, user: userId }).save()
-  return true
+  const followed = await UserFollowRoadmap.findOne({ roadmap: roadmapId, user: userId })
+  if (followed) return false
+  const [, updatedRoadmap] = await Promise.all([
+    new UserFollowRoadmap({ roadmap: roadmapId, user: userId }).save(),
+    Roadmap.findOneAndUpdate({ id: roadmapId }, { $inc: { followers: 1 } }, { new: true })
+  ])
+  return updatedRoadmap
 }
 
 const unfollowRoadmap = async (roadmapId, userId) => {
-  await UserFollowRoadmap.findOneAndDelete({ roadmap: roadmapId, user: userId })
-  return true
+  const followed = await UserFollowRoadmap.findOne({ roadmap: roadmapId, user: userId })
+  if (!followed) return false
+  const [, updatedRoadmap] = await Promise.all([
+    UserFollowRoadmap.findOneAndDelete({ roadmap: roadmapId, user: userId }),
+    Roadmap.findOneAndUpdate({ id: roadmapId }, { $inc: { followers: -1 } }, { new: true })
+  ])
+  return updatedRoadmap
 }
 
 const turnOffNotifyFollow = async (roadmapId, userId) => {
@@ -76,8 +89,29 @@ const turnOnNotifyFollow = async (roadmapId, userId) => {
   return true
 }
 
+const starRm = async (roadmap, user) => {
+  const exist = await UserStarRoadmap.findOne({ user, roadmap })
+  if (exist) return false
+  const [, updatedRm] = await Promise.all([
+    new UserStarRoadmap({ user, roadmap }).save(),
+    Roadmap.findOneAndUpdate({ id: roadmap }, { $inc: { stars: 1 } }, { new: true }).lean()
+  ])
+  return updatedRm.stars
+}
+
+const unStarRm = async (roadmap, user) => {
+  const exist = await UserStarRoadmap.findOne({ user, roadmap })
+  if (!exist) return false
+  const [, updatedRm] = await Promise.all([
+    UserStarRoadmap.findOneAndDelete({ user, roadmap }),
+    Roadmap.findOneAndUpdate({ id: roadmap }, { $inc: { stars: -1 } }, { new: true }).lean()
+  ])
+  return updatedRm.stars
+}
+
 module.exports = {
   getRoadmapDetail,
+  isFollowing,
   getMyRoadmaps,
   createRoadmap,
   deleteRoadmap,
@@ -88,5 +122,7 @@ module.exports = {
   followRoadmap,
   unfollowRoadmap,
   turnOffNotifyFollow,
-  turnOnNotifyFollow
+  turnOnNotifyFollow,
+  starRm,
+  unStarRm
 }

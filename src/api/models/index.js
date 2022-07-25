@@ -13,9 +13,13 @@ const OrganizationUser = require('./organization-user.model')
 const LessonUpdate = require('./lesson-update.model')
 const Comment = require('./comment.model')
 const Rubric = require('./rubric.model')
-const Analysis = require('./analysis.model')
+const AnalysisUser = require('./analysis-user.model')
+const AnalysisLp = require('./analysis-lp.model')
 const Roadmap = require('./roadmap.model')
 const RoadmapStep = require('./roadmap-step.model')
+const UserStarLp = require('./user-star-lp.model')
+const UserStarRoadmap = require('./user-star-roadmap.model')
+const Admin = require('./admin.model')
 
 module.exports = {
   EditPermission,
@@ -33,7 +37,11 @@ module.exports = {
   LessonUpdate,
   Comment,
   Rubric,
-  Analysis,
+  AnalysisUser,
   Roadmap,
-  RoadmapStep
+  RoadmapStep,
+  UserStarRoadmap,
+  UserStarLp,
+  Admin,
+  AnalysisLp
 }

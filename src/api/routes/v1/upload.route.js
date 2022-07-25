@@ -11,5 +11,8 @@ router.route('/:lessonId')
   .delete(verifyToken, validation.deleteFileValidate, controller.deleteFile)
 router.route('/profile/avatar')
   .put(verifyToken, controller.changeAvatar)
+router.route('/roadmaps/:roadmapId/steps/:roadmapStepId')
+  .post(verifyToken, validation.uploadFileRoadmapValidate, controller.uploadFileRoadmap)
+  .delete(verifyToken, validation.uploadFileRoadmapValidate, controller.deleteFileRoadmap)
 
 module.exports = router

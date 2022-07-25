@@ -33,6 +33,10 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: 'STUDENT',
       required: true // 0: normal/student, 1: teacher
+    },
+    totalLp: {
+      type: Number,
+      default: 0
     }
   }
 )

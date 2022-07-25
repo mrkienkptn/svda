@@ -42,7 +42,7 @@ const updateAction = {
     name: Joi.string(),
     students: Joi.number(),
     online: Joi.boolean(),
-    resources: Joi.object(),
+    resources: Joi.object().allow(null),
     description: Joi.string(),
     action: Joi.string(),
     time: Joi.number(),

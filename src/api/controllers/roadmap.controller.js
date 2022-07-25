@@ -1,15 +1,20 @@
 const httpStatus = require('http-status')
+const schedule = require('node-schedule')
 
 const getApiResponse = require('../utils/response')
-const { roadmapRepo } = require('../repo')
+const { roadmapRepo, notifRepo } = require('../repo')
 
 const getRoadmapDetail = async (req, res, next) => {
-  const { id: ownerId } = req.payload
+  const { id: userId } = req.payload
   const { roadmapId } = req.params
   try {
-    const rs = await roadmapRepo.getRoadmapDetail(roadmapId)
+    const [rs, isFollowing] = await Promise.all([
+      roadmapRepo.getRoadmapDetail(roadmapId),
+      roadmapRepo.isFollowing(roadmapId, userId)
+    ])
     if (rs) {
-      rs.yours = rs.ownerId.toString() === ownerId
+      rs.yours = rs.ownerId.toString() === userId
+      rs.following = isFollowing
     }
     return res.status(httpStatus.OK).json(getApiResponse({ data: rs }))
   } catch (error) {
@@ -68,9 +73,24 @@ const createStep = async (req, res, next) => {
 }
 
 const updateStep = async (req, res, next) => {
-  const { stepId } = req.params
+  const { roadmapId, stepId } = req.params
   try {
     const rs = await roadmapRepo.updateStep(stepId, req.body)
+    if (req.body.reminderBefore) {
+      const reminderAt = new Date()
+      reminderAt.setDate(new Date(rs.finishDate).getDate() + parseInt(req.body.reminderBefore))
+      schedule.scheduleJob('Reminder roadmap', new Date(2022, 6, 5, 13, 36), () => {
+        console.log('caoishvcpiuy ihf iagsdkjfhais yfiauefiuewi')
+      })
+    }
+    if (req.body.checklist) {
+      if (req.body.updateChecklistType === 'ADD') {
+        await notifRepo.addOutcomeRmNotif(roadmapId, req.body.ownerId, req.body.content)
+      }
+      if (req.body.updateChecklistType === 'DONE') {
+        await notifRepo.doneOutcomeRmNotif(roadmapId, req.body.ownerId, req.body.content)
+      }
+    }
     return res.status(httpStatus.OK).json(getApiResponse({ data: rs }))
   } catch (error) {
     next(error)
@@ -90,8 +110,10 @@ const deleteStep = async (req, res, next) => {
 const followRoadmap = async (req, res, next) => {
   const { roadmapId } = req.params
   const { id } = req.payload
+  const { ownerId } = req.body
   try {
     const rs = await roadmapRepo.followRoadmap(roadmapId, id)
+    await notifRepo.followRoadmapNotif(roadmapId, id, ownerId)
     return res.status(httpStatus.OK).json(getApiResponse({ data: rs }))
   } catch (error) {
     next(error)
@@ -131,6 +153,28 @@ const turnOnNotifyFollow = async (req, res, next) => {
   }
 }
 
+const starRoadmap = async (req, res, next) => {
+  const { roadmapId } = req.params
+  const { id } = req.payload
+  try {
+    const rs = await roadmapRepo.starRm(roadmapId, id)
+    return res.status(httpStatus.OK).json(getApiResponse({ data: rs }))
+  } catch (error) {
+    next(error)
+  }
+}
+
+const unStarRoadmap = async (req, res, next) => {
+  const { roadmapId } = req.params
+  const { id } = req.payload
+  try {
+    const rs = await roadmapRepo.unStarRm(roadmapId, id)
+    return res.status(httpStatus.OK).json(getApiResponse({ data: rs }))
+  } catch (error) {
+    next(error)
+  }
+}
+
 module.exports = {
   getRoadmapDetail,
   getMyRoadmaps,
@@ -143,5 +187,7 @@ module.exports = {
   followRoadmap,
   unfollowRoadmap,
   turnOffNotifyFollow,
-  turnOnNotifyFollow
+  turnOnNotifyFollow,
+  starRoadmap,
+  unStarRoadmap
 }

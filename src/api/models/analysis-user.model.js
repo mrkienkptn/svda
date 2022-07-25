@@ -2,26 +2,25 @@ const mongoose = require('mongoose')
 
 const AnalysisSchema = new mongoose.Schema(
   {
-    users: {
-      type: Number
-    },
-    lps: {
-      type: Number
+    totalUsers: {
+      type: Number,
+      required: true
     },
     timestamp: {
-      type: Date
+      type: Date,
+      default: new Date()
     }
   },
   {
     timeseries: {
       timeField: 'timestamp',
-      granularity: 'minutes'
+      granularity: 'hours'
     },
     autoCreate: false,
     autoIndex: false
   }
 )
 
-const Analysis = mongoose.model('analysis', AnalysisSchema)
+const AnalysisUser = mongoose.model('analysis-user', AnalysisSchema)
 
-module.exports = Analysis
+module.exports = AnalysisUser

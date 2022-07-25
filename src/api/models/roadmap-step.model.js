@@ -22,13 +22,20 @@ const roadmapStepSchema = new mongoose.Schema(
       type: Object
     }],
     checklist: {
-      type: Object
+      type: Object,
+      default: {}
     },
     startDate: {
-      type: Date
+      type: Date,
+      default: new Date()
     },
     finishDate: {
-      type: Date
+      type: Date,
+      default: () => {
+        const d = new Date()
+        d.setDate(d.getDate() + 30)
+        return d
+      }
     },
     notify: {
       type: Boolean,
@@ -36,7 +43,14 @@ const roadmapStepSchema = new mongoose.Schema(
     },
     resources: [{
       type: Object
-    }]
+    }],
+    referenceLinks: [{
+      type: Object
+    }],
+    reminderBefore: {
+      type: Number,
+      default: 5
+    }
   },
   {
     timestamps: true

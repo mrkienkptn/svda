@@ -8,9 +8,10 @@ const roadmapSchema = new mongoose.Schema(
       type: String,
       default: () => nanoid(10)
     },
-    stars: [{
-      type: String
-    }],
+    stars: {
+      type: Number,
+      default: 0
+    },
     category: {
       type: String,
       required: true,
@@ -55,7 +56,14 @@ const roadmapSchema = new mongoose.Schema(
     comments: [{
       type: ObjectId,
       ref: 'comment'
-    }]
+    }],
+    followers: {
+      type: Number,
+      default: 0
+    }
+  },
+  {
+    timestamps: true
   }
 )
 roadmapSchema.indexes()

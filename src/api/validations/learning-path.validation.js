@@ -12,7 +12,8 @@ const searchLearningPath = {
   query: Joi.object({
     name: Joi.string().allow(''),
     category: Joi.string().allow(''),
-    stars: Joi.string(),
+    star: Joi.string().allow(''),
+    type: Joi.string().allow(''),
     ...joiPagination
   })
 }
@@ -67,6 +68,12 @@ const getLPEditors = {
   })
 }
 
+const starLP = {
+  params: Joi.object({
+    learningPathId: Joi.string().required()
+  })
+}
+
 module.exports = {
   getLPDetailValidate: customValidate(getLPDetail),
   searchLPValidate: customValidate(searchLearningPath),
@@ -75,5 +82,6 @@ module.exports = {
   updateLPValidate: customValidate(updateLearningPath),
   cloneLPValidate: customValidate(cloneLearningPath),
   editEditorValidate: customValidate(editEditor),
-  getLPEditorsValidate: customValidate(getLPEditors)
+  getLPEditorsValidate: customValidate(getLPEditors),
+  starLPValidation: customValidate(starLP)
 }

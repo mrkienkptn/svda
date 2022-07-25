@@ -8,6 +8,13 @@ const uploadFile = {
   })
 }
 
+const uploadFileRoadmap = {
+  params: Joi.object({
+    roadmapId: Joi.string().required(),
+    roadmapStepId: Joi.string().required()
+  })
+}
+
 const deleteFile = {
   params: Joi.object({
     lessonId: Joi.string().required()
@@ -20,5 +27,6 @@ const deleteFile = {
 
 module.exports = {
   uploadFileValidate: customValidate(uploadFile),
-  deleteFileValidate: customValidate(deleteFile)
+  deleteFileValidate: customValidate(deleteFile),
+  uploadFileRoadmapValidate: customValidate(uploadFileRoadmap)
 }

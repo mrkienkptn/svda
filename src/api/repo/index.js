@@ -9,6 +9,9 @@ const learningActionRepo = require('./learning-action.repo')
 const commentRepo = require('./comment.repo')
 const rubricRepo = require('./rubric.repo')
 const roadmapRepo = require('./roadmap.repo')
+const notifRepo = require('./notif.repo')
+const analysisRepo = require('./analysis.repo')
+const adminRepo = require('./admin.repo')
 
 module.exports = {
   userRepo,
@@ -21,5 +24,8 @@ module.exports = {
   learningActionRepo,
   commentRepo,
   rubricRepo,
-  roadmapRepo
+  roadmapRepo,
+  notifRepo,
+  analysisRepo,
+  adminRepo
 }

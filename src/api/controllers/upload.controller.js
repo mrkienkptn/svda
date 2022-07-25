@@ -2,9 +2,10 @@ const httpStatus = require('http-status')
 const path = require('path')
 const fs = require('fs')
 const sharp = require('sharp')
+const { nanoid } = require('nanoid')
 
 const getApiResponse = require('../utils/response')
-const { lessonRepo, userRepo } = require('../repo')
+const { lessonRepo, userRepo, roadmapRepo } = require('../repo')
 
 const uploadFile = async (req, res, next) => {
   const { lessonId } = req.params
@@ -18,17 +19,18 @@ const uploadFile = async (req, res, next) => {
     if (!fs.existsSync(uploadFolder)) {
       fs.mkdirSync(uploadFolder)
     }
-    const mvFiles = Object.entries(req.files).map(([name, file]) =>
-      file.mv(`${uploadFolder}/${file.name}`)
+    const prefixes = new Array(Object.keys(req.files).length).fill(nanoid(6))
+    const mvFiles = Object.entries(req.files).map(([name, file], index) =>
+      file.mv(`${uploadFolder}/${prefixes[index]}-${file.name}`)
     )
-    const resData = Object.entries(req.files).map(([name, file]) =>
-      ({ name: file.name, type: file.mimetype })
+    const resData = Object.entries(req.files).map(([name, file], index) =>
+      ({ name: `${prefixes[index]}-${file.name}`, type: file.mimetype })
     )
     const addLinkToLesson = lessonRepo.updateLesson(lessonId, {
       $addToSet: {
         resources: {
-          $each: Object.entries(req.files).map(([name, file]) => ({
-            name: file.name,
+          $each: Object.entries(req.files).map(([name, file], index) => ({
+            name: `${prefixes[index]}-${file.name}`,
             type: file.mimetype
           }))
         }
@@ -82,8 +84,60 @@ const changeAvatar = async (req, res, next) => {
   }
 }
 
+const uploadFileRoadmap = async (req, res, next) => {
+  const { roadmapId, roadmapStepId } = req.params
+  try {
+    if (!req.files || Object.keys(req.files).length === 0) {
+      return res
+        .status(httpStatus.BAD_REQUEST)
+        .json(getApiResponse({ msg: 'No files were uploaded' }))
+    }
+    const uploadFolder = path.join(__dirname, '..', '..', 'resources', roadmapId, roadmapStepId)
+    if (!fs.existsSync(uploadFolder)) {
+      fs.mkdirSync(uploadFolder, { recursive: true })
+    }
+    const prefixes = new Array(Object.keys(req.files).length).fill(nanoid(6))
+    const mvFiles = Object.entries(req.files).map(([name, file], index) =>
+      file.mv(`${uploadFolder}/${prefixes[index]}-${file.name}`)
+    )
+    const resData = Object.entries(req.files).map(([name, file], index) =>
+      ({ name: `${prefixes[index]}-${file.name}`, type: file.mimetype })
+    )
+    const addLinkToRoadmapStep = roadmapRepo.updateStep(roadmapStepId, {
+      $addToSet: {
+        resources: {
+          $each: Object.entries(req.files).map(([name, file], index) => ({
+            name: `${prefixes[index]}-${file.name}`,
+            type: file.mimetype
+          }))
+        }
+      }
+    })
+    await Promise.all([...mvFiles, addLinkToRoadmapStep])
+    return res.status(httpStatus.OK).json(getApiResponse({ data: resData }))
+  } catch (error) {
+    next(error)
+  }
+}
+
+const deleteFileRoadmap = async (req, res, next) => {
+  const { roadmapId, roadmapStepId } = req.params
+  const { name, type } = req.body
+  try {
+    fs.unlinkSync(path.join(__dirname, '..', '..', 'resources', roadmapId, roadmapStepId, name))
+    await roadmapRepo.updateStep(roadmapStepId, {
+      $pull: { resources: { name, type } }
+    })
+    return res.status(httpStatus.OK).json(getApiResponse({ msg: 'Deleted' }))
+  } catch (error) {
+    next(error)
+  }
+}
+
 module.exports = {
   uploadFile,
   deleteFile,
-  changeAvatar
+  changeAvatar,
+  uploadFileRoadmap,
+  deleteFileRoadmap
 }
