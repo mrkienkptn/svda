@@ -11,6 +11,10 @@ const updateOrganization = async (ogzId, data) => {
   return await Organization.findByIdAndUpdate(ogzId, data, { new: true })
 }
 
+const updateBackgroundImg = async (ogzId, data) => {
+  return await Organization.findByIdAndUpdate(ogzId, data)
+}
+
 const createOgzLP = async (ogzId, data) => {
   const newLpId = new ObjectId()
   const createdOgzLP = (new LearningPath({ ...data, _id: newLpId })).save()
@@ -95,5 +99,6 @@ module.exports = {
   getMembers,
   getMyOgzs,
   acceptInvite,
-  denyInvite
+  denyInvite,
+  updateBackgroundImg
 }

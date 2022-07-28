@@ -1,5 +1,6 @@
 const { Notification, UserFollowRoadmap } = require('../models')
 const { NOTIF } = require('../constants')
+const { notifService } = require('../services')
 const { ObjectId } = require('mongoose').Types
 
 const cmtRoadmapNotif = async (userCmt, roadmapId, roadmapOwner) => {
@@ -31,6 +32,12 @@ const addOutcomeRmNotif = async (roadmapId, roadmapOwner, content) => {
     content,
     roadmap: roadmapId
   }))
+  notifService.pushNotif({
+    notifType: NOTIF.DONE_RM_CL,
+    from: roadmapOwner,
+    to: followers.map(flw => flw.user),
+    roadmap: roadmapId
+  }).then((res) => console.log(res.status))
   return await Notification.insertMany(notifs)
 }
 
@@ -43,6 +50,12 @@ const doneOutcomeRmNotif = async (roadmapId, roadmapOwner, content) => {
     content,
     roadmap: roadmapId
   }))
+  notifService.pushNotif({
+    notifType: NOTIF.DONE_RM_CL,
+    from: roadmapOwner,
+    to: followers.map(flw => flw.user),
+    roadmap: roadmapId
+  }).then((res) => console.log(res.status))
   return await Notification.insertMany(notifs)
 }
 
@@ -53,6 +66,12 @@ const followRoadmapNotif = async (roadmapId, followerId, roadmapOwner) => {
     to: roadmapOwner,
     roadmap: roadmapId
   })
+  notifService.pushNotif({
+    notifType: NOTIF.FOLLOW_RM,
+    from: followerId,
+    to: [roadmapOwner],
+    roadmap: roadmapId
+  }).then((res) => console.log(res.status))
   return await notif.save()
 }
 
@@ -81,7 +100,6 @@ const seenNotif = async (notifId) => {
 }
 
 const getNotifs = async (userId) => {
-  console.log(userId)
   const rs = await Notification.aggregate([
     {
       $match: { to: new ObjectId(userId) }

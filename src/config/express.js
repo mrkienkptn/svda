@@ -4,7 +4,7 @@ const bodyParser = require('body-parser')
 const compress = require('compression')
 const methodOverride = require('method-override')
 const cors = require('cors')
-const helmet = require('helmet')
+// const helmet = require('helmet')
 const timeout = require('connect-timeout')
 const fileUpload = require('express-fileupload')
 const path = require('path')
@@ -42,7 +42,7 @@ app.use(compress())
 app.use(methodOverride())
 
 // secure apps by setting various HTTP headers
-app.use(helmet())
+// app.use(helmet())
 
 // enable CORS - Cross Origin Resource Sharing
 app.use(cors())

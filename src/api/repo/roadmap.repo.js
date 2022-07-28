@@ -61,7 +61,7 @@ const updateStep = async (id, data) => {
 
 const followRoadmap = async (roadmapId, userId) => {
   const followed = await UserFollowRoadmap.findOne({ roadmap: roadmapId, user: userId })
-  if (followed) return false
+  if (followed !== null) return false
   const [, updatedRoadmap] = await Promise.all([
     new UserFollowRoadmap({ roadmap: roadmapId, user: userId }).save(),
     Roadmap.findOneAndUpdate({ id: roadmapId }, { $inc: { followers: 1 } }, { new: true })
@@ -71,7 +71,7 @@ const followRoadmap = async (roadmapId, userId) => {
 
 const unfollowRoadmap = async (roadmapId, userId) => {
   const followed = await UserFollowRoadmap.findOne({ roadmap: roadmapId, user: userId })
-  if (!followed) return false
+  if (followed === null) return false
   const [, updatedRoadmap] = await Promise.all([
     UserFollowRoadmap.findOneAndDelete({ roadmap: roadmapId, user: userId }),
     Roadmap.findOneAndUpdate({ id: roadmapId }, { $inc: { followers: -1 } }, { new: true })

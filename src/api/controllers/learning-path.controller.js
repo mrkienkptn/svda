@@ -153,11 +153,24 @@ const getCourseData = async (req, res, next) => {
 const exportCourse = async (req, res, next) => {
   const { learningPathId } = req.params
   try {
+    // write data
     const courseData = await learningPathRepo.getCourseData(learningPathId)
     const jsonData = JSON.stringify(courseData)
     const scormPath = path.join(__dirname, '..', '..', 'asset', 'scorm/')
     const dataPath = path.join(__dirname, '..', '..', 'asset', 'scorm', 'data', 'data.json')
     fs.writeFileSync(dataPath, jsonData)
+    // change scorm name
+    const imsmanifestPath = path.join(__dirname, '..', '..', 'asset')
+    const imsData = fs
+      .readFileSync(`${imsmanifestPath}/changes/imsmanifest.xml`, { encoding: 'utf8' })
+      .toString()
+    fs.writeFileSync(
+      `${imsmanifestPath}/scorm/imsmanifest.xml`,
+      imsData.replace(/COURSE_NAME/g, courseData.name),
+      { encoding: 'utf8' }
+    )
+
+    // zip
     const archive = archiver('zip')
     archive.directory(scormPath, false)
     archive.pipe(res)

@@ -5,7 +5,7 @@ const sharp = require('sharp')
 const { nanoid } = require('nanoid')
 
 const getApiResponse = require('../utils/response')
-const { lessonRepo, userRepo, roadmapRepo } = require('../repo')
+const { lessonRepo, userRepo, roadmapRepo, organizationRepo } = require('../repo')
 
 const uploadFile = async (req, res, next) => {
   const { lessonId } = req.params
@@ -17,7 +17,7 @@ const uploadFile = async (req, res, next) => {
     }
     const uploadFolder = path.join(__dirname, '..', '..', 'resources', lessonId)
     if (!fs.existsSync(uploadFolder)) {
-      fs.mkdirSync(uploadFolder)
+      fs.mkdirSync(uploadFolder, { recursive: true })
     }
     const prefixes = new Array(Object.keys(req.files).length).fill(nanoid(6))
     const mvFiles = Object.entries(req.files).map(([name, file], index) =>
@@ -62,7 +62,7 @@ const changeAvatar = async (req, res, next) => {
   try {
     const avatarFolder = path.join(__dirname, '..', '..', 'resources', 'avatars', id)
     if (!fs.existsSync(avatarFolder)) {
-      fs.mkdirSync(avatarFolder)
+      fs.mkdirSync(avatarFolder, { recursive: true })
     }
     const file = req.files.avatar
     const [, , user] = await Promise.all([
@@ -134,10 +134,34 @@ const deleteFileRoadmap = async (req, res, next) => {
   }
 }
 
+const uploadBackgroundOgz = async (req, res, next) => {
+  const { ogzId: id } = req.params
+  try {
+    const bgFolder = path.join(__dirname, '..', '..', 'resources', 'organizations', id)
+    if (!fs.existsSync(bgFolder)) {
+      fs.mkdirSync(bgFolder, { recursive: true })
+    }
+    const file = req.files.ogzBg
+    const [, ogz] = await Promise.all([
+      file.mv(`${bgFolder}/${file.name}`),
+      organizationRepo.updateBackgroundImg(id, { backgroundImg: file.name })
+    ])
+    if (ogz.backgroundImg && ogz.backgroundImg !== file.name) {
+      if (fs.existsSync(`${bgFolder}/${ogz.backgroundImg}`)) {
+        fs.unlinkSync(`${bgFolder}/${ogz.backgroundImg}`)
+      }
+    }
+    return res.status(httpStatus.OK).json(getApiResponse({ data: file.name }))
+  } catch (error) {
+    next(error)
+  }
+}
+
 module.exports = {
   uploadFile,
   deleteFile,
   changeAvatar,
   uploadFileRoadmap,
-  deleteFileRoadmap
+  deleteFileRoadmap,
+  uploadBackgroundOgz
 }

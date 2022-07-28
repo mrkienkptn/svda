@@ -14,5 +14,7 @@ router.route('/profile/avatar')
 router.route('/roadmaps/:roadmapId/steps/:roadmapStepId')
   .post(verifyToken, validation.uploadFileRoadmapValidate, controller.uploadFileRoadmap)
   .delete(verifyToken, validation.uploadFileRoadmapValidate, controller.deleteFileRoadmap)
+router.route('/organizations/:ogzId/background')
+  .put(verifyToken, validation.uploadBackgroundOgzValidate, controller.uploadBackgroundOgz)
 
 module.exports = router

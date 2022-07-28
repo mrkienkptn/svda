@@ -15,13 +15,17 @@ const updateOrganization = {
   params: Joi.object({
     ogzId: Joi.string().required()
   }),
-  body: {
-    name: Joi.string().required(),
-    ogzType: Joi.string().required(),
-    admin: Joi.string().required(),
-    description: Joi.string(),
-    imageLink: Joi.string()
-  }
+  body: Joi.object({
+    name: Joi.string(),
+    admin: Joi.string(),
+    description: Joi.string().allow(''),
+    backgroundImg: Joi.string().allow(''),
+    address: Joi.string().allow(''),
+    email: Joi.string().allow(''),
+    category: Joi.string().allow(''),
+    phone: Joi.string().allow(''),
+    foundDate: Joi.date().allow(null)
+  })
 }
 
 const getOrganization = {

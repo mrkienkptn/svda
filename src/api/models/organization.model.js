@@ -22,7 +22,28 @@ const organizationSchema = new mongoose.Schema(
     ogzType: {
       type: String,
       required: true
+    },
+    address: {
+      type: String
+    },
+    email: {
+      type: String
+    },
+    phone: {
+      type: String
+    },
+    category: {
+      type: String
+    },
+    foundDate: {
+      type: Date
+    },
+    backgroundImg: {
+      type: String
     }
+  },
+  {
+    timestamps: true
   }
 )
 

@@ -36,5 +36,6 @@ module.exports = {
     clientId: process.env.OAUTH_CLIENTID || '694408575075-u9junos4ffksiljpu9c8r3ksvqk6accq.apps.googleusercontent.com',
     clientSecret: process.env.OAUTH_CLIENT_SECRET || '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',
     refreshToken: process.env.OAUTH_REFRESH_TOKEN || '1//04CLwavmajyukCgYIARAAGAQSNwF-L9Iroq3z1HWh7xxw7IFiuSeJzLic5IkXWWzvcbFQvqR90wkJFg76HxwW4ElZI4Jy_shAiqw'
-  }
+  },
+  socketServer: `http://${process.env.SOCKET_HOST || 'localhost'}:${process.env.SOCKET_PORT || 4000}`
 }

@@ -165,7 +165,7 @@ function setActivity(lessonParts, lessonId) {
                     <button type='button' class='act-resources has-icon' data-bs-toggle="modal"
                       data-bs-target="#resource-action-${action._id}" >
                       <img src='attachment.png' alt='time' width='16' height='16'>
-                      <label>${Object.keys(action.resources).length}</label>
+                      <label>${action.resources ? Object.keys(action.resources).length : 0 }</label>
                     </button>
                   </div>
                   <div class='act-des'>${action.description}</div>

@@ -25,8 +25,15 @@ const deleteFile = {
   })
 }
 
+const uploadBackgroundOgz = {
+  params: Joi.object({
+    ogzId: Joi.string().required()
+  })
+}
+
 module.exports = {
   uploadFileValidate: customValidate(uploadFile),
   deleteFileValidate: customValidate(deleteFile),
-  uploadFileRoadmapValidate: customValidate(uploadFileRoadmap)
+  uploadFileRoadmapValidate: customValidate(uploadFileRoadmap),
+  uploadBackgroundOgzValidate: customValidate(uploadBackgroundOgz)
 }
